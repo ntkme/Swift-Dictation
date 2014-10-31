@@ -169,13 +169,6 @@ static NSString *const kAppMenuItemLanguage = @"Language";
         [statusItem setHighlightMode:YES];
         [statusItem setMenu:mainMenu];
     }
-    if ([[MasterDictationManager defaultManager] isEnabled]) {
-        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation On)"]];
-        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation On)"]];
-    } else {
-        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation Off)"]];
-        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation Off)"]];
-    }
     if ([[MasterDictationManager defaultManager] isEnabled] && [[NSUserDefaults standardUserDefaults] boolForKey:kAppUserDefaultShowDictationLanguage]) {
         [statusItem setAttributedTitle:[[NSAttributedString alloc] initWithString:[[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier
                                                                                                                         value:[[MasterDictationManager defaultManager] localeIdentifier]]
@@ -184,6 +177,13 @@ static NSString *const kAppMenuItemLanguage = @"Language";
                                                                                     }]];
     } else {
         [statusItem setTitle:nil];
+    }
+    if ([[MasterDictationManager defaultManager] isEnabled]) {
+        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation On)"]];
+        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation On)"]];
+    } else {
+        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation Off)"]];
+        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation Off)"]];
     }
 }
 
