@@ -35,17 +35,24 @@
             [languageIdentifiers addObject:languageIdentifier];
         }
     }
+    CFRelease(inputSourceList);
     return [languageIdentifiers copy];
 }
 
 - (NSString *)language
 {
-    return (__bridge NSString *)CFArrayGetValueAtIndex(TISGetInputSourceProperty(TISCopyCurrentKeyboardInputSource(), kTISPropertyInputSourceLanguages), 0);
+    TISInputSourceRef currentKeyboardInputSource = TISCopyCurrentKeyboardInputSource();
+    NSString *language = (__bridge NSString *)CFArrayGetValueAtIndex(TISGetInputSourceProperty(currentKeyboardInputSource, kTISPropertyInputSourceLanguages), 0);
+    CFRelease(currentKeyboardInputSource);
+    return language;
 }
 
 - (NSString *)bundleIdentifier
 {
-    return (__bridge NSString *)TISGetInputSourceProperty(TISCopyCurrentKeyboardInputSource(), kTISPropertyBundleID);
+    TISInputSourceRef currentKeyboardInputSource = TISCopyCurrentKeyboardInputSource();
+    NSString *bundleIdentifier = (__bridge NSString *)TISGetInputSourceProperty(currentKeyboardInputSource, kTISPropertyBundleID);
+    CFRelease(currentKeyboardInputSource);
+    return bundleIdentifier;
 }
 
 @end

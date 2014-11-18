@@ -28,12 +28,17 @@
 
 - (BOOL)isEnabled
 {
-    for (NSDictionary *jobDictionary in (__bridge NSArray *)SMCopyAllJobDictionaries(kSMDomainUserLaunchd)) {
-        if ([[jobDictionary objectForKey:@"Label"] isEqualToString:bundleIdentifier]) {
-            return YES;
+    BOOL enabled = NO;
+    CFArrayRef allJobDictionaries = SMCopyAllJobDictionaries(kSMDomainUserLaunchd);
+    CFIndex i, c = CFArrayGetCount(allJobDictionaries);
+    for (i = 0; i < c; i++) {
+        if ([[(NSDictionary *)CFArrayGetValueAtIndex(allJobDictionaries, i) objectForKey:@"Label"] isEqualToString:bundleIdentifier]) {
+            enabled = YES;
+            break;
         }
     }
-    return NO;
+    CFRelease(allJobDictionaries);
+    return enabled;
 }
 
 - (void)setEnabled:(BOOL)flag
