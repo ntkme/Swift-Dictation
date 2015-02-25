@@ -87,7 +87,11 @@ static NSString *const kAppMenuItemLanguage = @"Language";
 - (void)awakeFromNib
 {
     [openAtLoginMenuItem bind:@"value"
-                     toObject:[LoginItem loginItemWithBundleIdentifier:[[[NSBundle mainBundle] bundleIdentifier] stringByAppendingString:@"-Login-Helper"]]
+                     toObject:[LoginItem loginItemWithBundleIdentifier:[[NSBundle bundleWithPath:[[[[[[NSBundle mainBundle] bundlePath]
+                                                                                                     stringByAppendingPathComponent:@"Contents"]
+                                                                                                    stringByAppendingPathComponent:@"Library"]
+                                                                                                   stringByAppendingPathComponent:@"LoginItems"]
+                                                                                                  stringByAppendingPathComponent:@"Swift Dictation Login Helper.app"]] bundleIdentifier]]
                   withKeyPath:@"self.enabled"
                       options:nil];
 
