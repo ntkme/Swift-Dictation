@@ -8,6 +8,8 @@
 
 #import "LoginItem.h"
 
+extern CFArrayRef SMCopyAllJobDictionaries(CFStringRef) __attribute__((weak_import));
+
 @implementation LoginItem
 
 @synthesize bundleIdentifier;
@@ -28,17 +30,28 @@
 
 - (BOOL)isEnabled
 {
-    BOOL enabled = NO;
-    CFArrayRef allJobDictionaries = SMCopyAllJobDictionaries(kSMDomainUserLaunchd);
-    CFIndex i, c = CFArrayGetCount(allJobDictionaries);
-    for (i = 0; i < c; i++) {
-        if ([[(NSDictionary *)CFArrayGetValueAtIndex(allJobDictionaries, i) objectForKey:@"Label"] isEqualToString:bundleIdentifier]) {
-            enabled = YES;
-            break;
+    if (SMCopyAllJobDictionaries != NULL) {
+        BOOL enabled = NO;
+        CFArrayRef allJobDictionaries = SMCopyAllJobDictionaries(kSMDomainUserLaunchd);
+        CFIndex i, c = CFArrayGetCount(allJobDictionaries);
+        for (i = 0; i < c; i++) {
+            if ([[(NSDictionary *)CFArrayGetValueAtIndex(allJobDictionaries, i) objectForKey:@"Label"] isEqualToString:bundleIdentifier]) {
+                enabled = YES;
+                break;
+            }
         }
+        CFRelease(allJobDictionaries);
+        return enabled;
+    } else {
+        NSTask *task = [[NSTask alloc] init];
+        [task setLaunchPath:@"/bin/launchctl"];
+        [task setArguments: @[@"print-disabled", [NSString stringWithFormat:@"user/%i", getuid()]]];
+        NSPipe *pipe = [NSPipe pipe];
+        [task setStandardOutput:pipe];
+        [task launch];
+        NSString *disabled = [[NSString alloc] initWithData:[[pipe fileHandleForReading] readDataToEndOfFile] encoding:NSUTF8StringEncoding];
+        return [disabled rangeOfString:[NSString stringWithFormat:@"\"%@\" => false", bundleIdentifier]].location != NSNotFound;
     }
-    CFRelease(allJobDictionaries);
-    return enabled;
 }
 
 - (void)setEnabled:(BOOL)flag
