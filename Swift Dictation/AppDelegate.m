@@ -127,6 +127,19 @@ static NSString *const kAppMenuItemLanguage = @"Language";
                                 usingBlock:^(NSMenuItem *menuItem, NSUInteger idx, BOOL *stop) {
                                     [mainMenu insertItem:menuItem atIndex:0];
                                 }];
+
+    statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    if ([statusItem respondsToSelector:@selector(button)]) {
+        NSImage *image = [NSImage imageNamed:@"StatusItemImage"];
+        [image setTemplate:YES];
+        [[statusItem button] setImagePosition:NSImageOnly];
+        [[statusItem button] setImage:image];
+    } else {
+        [statusItem setHighlightMode:YES];
+        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage"]];
+        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage"]];
+    }
+    [statusItem setMenu:mainMenu];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -155,7 +168,7 @@ static NSString *const kAppMenuItemLanguage = @"Language";
                 [[MasterDictationManager defaultManager] terminate];
             }
         }
-        [self setStatusItem];
+        [self setStatusItemTitle];
     };
 
     [[NSNotificationCenter defaultCenter] addObserverForName:NSTextInputContextKeyboardSelectionDidChangeNotification
@@ -166,28 +179,21 @@ static NSString *const kAppMenuItemLanguage = @"Language";
     inputMethodDidChange(nil);
 }
 
-- (void)setStatusItem
+- (void)setStatusItemTitle
 {
-    if (!statusItem) {
-        statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-        [statusItem setHighlightMode:YES];
-        [statusItem setMenu:mainMenu];
-    }
+    NSAttributedString *title = nil;
     if ([[MasterDictationManager defaultManager] isEnabled] && [[NSUserDefaults standardUserDefaults] boolForKey:kAppUserDefaultShowDictationLanguage]) {
-        [statusItem setAttributedTitle:[[NSAttributedString alloc] initWithString:[[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier
-                                                                                                                        value:[[MasterDictationManager defaultManager] localeIdentifier]]
-                                                                       attributes:@{
-                                                                                    NSFontAttributeName:[NSFont systemFontOfSize:11]
-                                                                                    }]];
-    } else {
-        [statusItem setTitle:nil];
+        title = [[NSAttributedString alloc] initWithString:[@" " stringByAppendingString:[[NSLocale currentLocale] displayNameForKey:NSLocaleIdentifier
+                                                                                                                               value:[[MasterDictationManager defaultManager] localeIdentifier]]]
+                                                attributes:@{
+                                                             NSFontAttributeName:[NSFont systemFontOfSize:11]
+                                                             }];
     }
-    if ([[MasterDictationManager defaultManager] isEnabled]) {
-        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation On)"]];
-        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation On)"]];
+    if ([statusItem respondsToSelector:@selector(button)]) {
+        [[statusItem button] setImagePosition:title == nil ? NSImageOnly : NSImageLeft];
+        [[statusItem button] setAttributedTitle:title];
     } else {
-        [statusItem setImage:[NSImage imageNamed:@"StatusItemImage (Dictation Off)"]];
-        [statusItem setAlternateImage:[NSImage imageNamed:@"StatusItemAlternateImage (Dictation Off)"]];
+        [statusItem setAttributedTitle:title];
     }
 }
 
@@ -251,7 +257,7 @@ static NSString *const kAppMenuItemLanguage = @"Language";
     [[NSUserDefaults standardUserDefaults] setBool:![[NSUserDefaults standardUserDefaults] boolForKey:kAppUserDefaultShowDictationLanguage]
                                             forKey:kAppUserDefaultShowDictationLanguage];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [self setStatusItem];
+    [self setStatusItemTitle];
 }
 
 - (IBAction)openDictationAndSpeechPreferencesAction:(id)sender

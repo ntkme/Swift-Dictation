@@ -12,6 +12,7 @@
 @interface LoginItem : NSObject
 
 @property NSString *bundleIdentifier;
+@property (getter=isEnabled) BOOL enabled;
 
 + (LoginItem *)loginItemWithBundleIdentifier:(NSString *)aBundleIdentifier;
 - (id)initWithBundleIdentifier:(NSString *)aBundleIdentifier;
