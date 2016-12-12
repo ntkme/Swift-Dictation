@@ -76,7 +76,7 @@ static NSString *const kAppMenuItemLanguage = @"Language";
 
     [[NSUserDefaults standardUserDefaults] setObject:[defaultDictationLocaleIdentifiers sortedArrayUsingComparator:^NSComparisonResult(NSString *localeIdentifier1, NSString *localeIdentifier2) {
         if ([[NSLocale canonicalLocaleIdentifierFromString:localeIdentifier1
-                                             forComponents:@[NSLocaleLanguageCode, NSLocaleScriptCode]] isEqualToString:[NSLocale canonicalLocaleIdentifierFromString:localeIdentifier1
+                                             forComponents:@[NSLocaleLanguageCode, NSLocaleScriptCode]] isEqualToString:[NSLocale canonicalLocaleIdentifierFromString:localeIdentifier2
                                                                                                                                                         forComponents:@[NSLocaleLanguageCode, NSLocaleScriptCode]]]) {
             NSInteger index1 = [[[NSUserDefaults standardUserDefaults] arrayForKey:kAppUserDefaultLocaleSupport] indexOfObject:localeIdentifier1];
             NSInteger index2 = [[[NSUserDefaults standardUserDefaults] arrayForKey:kAppUserDefaultLocaleSupport] indexOfObject:localeIdentifier2];
