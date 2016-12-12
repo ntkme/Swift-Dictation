@@ -39,6 +39,13 @@ static NSString *const kAppMenuItemLanguage = @"Language";
     }
 
     NSArray *preferredLanguages = [NSLocale preferredLanguages];
+    NSMutableArray *preferredCanonicalLocaleIdentifiers = [NSMutableArray arrayWithCapacity:[preferredLanguages count]];
+    for (NSString *language in preferredLanguages) {
+        [preferredCanonicalLocaleIdentifiers addObject:[NSLocale canonicalLocaleIdentifierFromString:language
+                                                                                       forComponents:@[NSLocaleLanguageCode, NSLocaleScriptCode]]];
+    }
+    preferredLanguages = [preferredCanonicalLocaleIdentifiers copy];
+
     NSArray *enabledInputMethodLanguages = [[InputMethodManager defaultManager] enabledInputMethodLanguages];
     defaultDictationLocaleIdentifiers = [[defaultDictationLocaleIdentifiers filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSString *localeIdentifier, NSDictionary *bindings) {
         NSString *language = [NSLocale canonicalLocaleIdentifierFromString:localeIdentifier
