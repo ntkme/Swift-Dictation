@@ -269,7 +269,12 @@ static NSString *const kAppMenuItemLanguage = @"Language";
 
 - (IBAction)openDictationAndSpeechPreferencesAction:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Speech.prefPane"]];
+    NSString *currentSystemVersion = [[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"];
+    if ([currentSystemVersion compare:@"10.12" options:NSNumericSearch] != NSOrderedAscending) {
+        [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Keyboard.prefPane"]];
+    } else {
+        [[NSWorkspace sharedWorkspace] openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Speech.prefPane"]];
+    }
 }
 
 @end
